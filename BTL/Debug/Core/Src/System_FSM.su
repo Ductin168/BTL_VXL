@@ -1,0 +1,9 @@
+System_FSM.c:30:6:switchAutoState	24	static
+System_FSM.c:37:6:display_i2c	24	static
+System_FSM.c:43:6:display_i2c1	24	static
+System_FSM.c:49:6:fsm_traffic_auto_mode	8	static
+System_FSM.c:130:6:logNewTime	8	static
+System_FSM.c:138:6:fsm_traffic_tunning_mode	136	static
+System_FSM.c:275:6:fsm_switch_mode	8	static
+System_FSM.c:292:6:fsm_traffic	8	static
+System_FSM.c:323:6:clock_counter_traffic_update	4	static
