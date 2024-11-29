@@ -42,6 +42,8 @@ extern int timeRed;
 extern int timeAmber;
 extern int timeGreen;
 
+extern int clock_counter_main;
+extern int clock_counter_side;
 
 //String use for UART
 extern char str[];
@@ -53,6 +55,6 @@ extern UART_HandleTypeDef huart2;
 extern int autoStatus;
 extern int manualStatus;
 extern int tuningStatus;
-extern int trafficMODE;
+extern int trafficMode;
 
 #endif /* INC_GLOBAL_H_ */

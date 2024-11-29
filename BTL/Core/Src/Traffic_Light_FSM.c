@@ -7,19 +7,6 @@
 
 #include "Traffic_Light_FSM.h"
 
-// Common function to control LED states
-//void setLEDState(GPIO_PinState red, GPIO_PinState amber, GPIO_PinState green, int index) {
-//    if (index == 0) { // Way 1
-//        HAL_GPIO_WritePin(GPIOA, RED_LED1_Pin, red);
-//        HAL_GPIO_WritePin(GPIOA, AMBER_LED1_Pin, amber);
-//        HAL_GPIO_WritePin(GPIOA, GREEN_LED1_Pin, green);
-//    } else if (index == 1) { // Way 2
-//        HAL_GPIO_WritePin(GPIOA, RED_LED2_Pin, red);
-//        HAL_GPIO_WritePin(GPIOA, AMBER_LED2_Pin, amber);
-//        HAL_GPIO_WritePin(GPIOA, GREEN_LED2_Pin, green);
-//    }
-//}
-// Turn off all LEDs
 void turnOffAllLED(void) {
 	HAL_GPIO_WritePin(GPIOB, LED1_A_Pin|LED1_B_Pin, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOA, LED2_A_Pin|LED2_B_Pin, GPIO_PIN_RESET);
@@ -67,7 +54,7 @@ void blinkyRed(void) {
 
 // Blink AMBER LEDs
 void blinkyAmber(void) {
-    if (timerFlag[6] == 1) {
+    if (timerFlag[7] == 1) {
         HAL_GPIO_WritePin(GPIOB, LED1_A_Pin, RESET);
         HAL_GPIO_TogglePin(GPIOB, LED1_B_Pin);
         HAL_GPIO_WritePin(GPIOA, LED2_A_Pin, RESET);

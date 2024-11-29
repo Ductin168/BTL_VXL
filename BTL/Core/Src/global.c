@@ -7,7 +7,20 @@
 
 #include "global.h"
 
-int autoStatus=INIT;
+// Trạng thái chính
+int trafficMode = INIT;
+int autoStatus = INIT;
+int manualStatus = OFF;
+int tuningStatus = OFF;
+
+// Bộ đếm thời gian cho từng hướng
+int clock_counter_main = 0;
+int clock_counter_side = 0;
+
+// Thời gian mỗi đèn trong chế độ tự động
+int timeRed = 5;
+int timeAmber = 2;
+int timeGreen = 3;
 char str[50];
-//int trafficMode=AUTO_MODE;
+
 UART_HandleTypeDef huart2;

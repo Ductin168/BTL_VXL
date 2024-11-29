@@ -107,12 +107,12 @@ int main(void)
   lcd_clear_display();
   HAL_Delay(50);
 
-//  SCH_Init();
-//  SCH_Add_Task(fsm_traffic, 0, 1);
-////  SCH_Add_Task(clock_counter_traffic_update, 0, 1);
-//  SCH_Add_Task(fsm_switch_mode, 0, 1);
-////  SCH_Add_Task(timerRun, 0, 1);
-////  SCH_Add_Task(getButtonValue, 0, 1);
+  SCH_Init();
+  SCH_Add_Task(fsm_traffic, 50, 1);
+//  SCH_Add_Task(clock_counter_traffic_update, 0, 1);
+  SCH_Add_Task(fsm_switch_mode, 50, 1);
+  SCH_Add_Task(fsm_traffic_auto_mode(), 50, 1);
+  SCH_Add_Task(fsm_traffic_tunning_mode(), 50, 1);
 
 
   /* USER CODE END 2 */
@@ -121,10 +121,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-fsm_traffic_auto_mode();
-fsm_traffic();
-fsm_switch_mode();
-fsm_traffic_tunning_mode();
+//fsm_traffic_auto_mode();
+//fsm_traffic_tunning_mode();
+//fsm_switch_mode();
+//fsm_traffic();
+	  SCH_Dispatch_Tasks();
 //	  if(isButtonShortPressed(0)){
 //		  lcd_clear_display();
 //		  HAL_Delay(100);

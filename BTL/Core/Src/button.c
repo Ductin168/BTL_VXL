@@ -1,12 +1,11 @@
 #include "button.h"
 
-
 int KeyReg0[NUM_BUTTONS] = {NORMAL_STATE};
 int KeyReg1[NUM_BUTTONS] = {NORMAL_STATE};
 int KeyReg2[NUM_BUTTONS] = {NORMAL_STATE};
 int KeyReg3[NUM_BUTTONS] = {NORMAL_STATE};
 
-int TimeOutForKeyPress[NUM_BUTTONS] = {5000};
+int TimeOutForKeyPress[NUM_BUTTONS] = {1000};
 int button_pressed[NUM_BUTTONS] = {0};
 int button_long_pressed[NUM_BUTTONS] = {0};
 int button_flag[NUM_BUTTONS] = {0};
@@ -26,6 +25,7 @@ int isButtonLongPressed(int button_index){
     }
     return 0;
 }
+
 void subKeyProcess(int button_index) {
     switch (button_index) {
         case 0:
@@ -33,8 +33,7 @@ void subKeyProcess(int button_index) {
         case 1:
             break;
         case 2:
-        	break;
-
+            break;
     }
     button_flag[button_index] = 1;
 }
@@ -59,7 +58,6 @@ void getKeyInput() {
                 if (KeyReg3[i] == PRESSED_STATE) {
                     TimeOutForKeyPress[i] = 1000;
                     subKeyProcess(i);
-                    button_flag[i] = 1;
                 }
             } else {
                 TimeOutForKeyPress[i]--;
@@ -67,11 +65,10 @@ void getKeyInput() {
                     TimeOutForKeyPress[i] = 1000;
                     if (KeyReg3[i] == PRESSED_STATE) {
                         button_long_pressed[i] = 1;
+                        button_flag[i] = 0; // Ensure short press is not set
                     }
                 }
             }
         }
     }
 }
-
-

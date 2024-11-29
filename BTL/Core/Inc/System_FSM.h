@@ -11,6 +11,12 @@
 #include <stdio.h>
 #include "i2c-lcd.h"
 #include "software_timer.h"
+#include <stdint.h>
+#include <stdbool.h>
+#include "stm32f1xx_hal.h"
+
+#define DEBOUNCE_DELAY 200 // 200 ms debounce delay
+
 void fsm_switch_mode(void);
 void fsm_traffic(void);
 void clock_counter_traffic_update(void);
