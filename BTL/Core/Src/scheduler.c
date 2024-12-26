@@ -1,153 +1,108 @@
-/*
- * scheduler.c
- *
- *  Created on: Nov 24, 2024
- *      Author: Dell
- */
-
-
 #include "scheduler.h"
-#include <stdlib.h>
 
-struct sTask{
-	void (* pTask)(void);
-	uint32_t Delay;
-	uint32_t Period;
-	struct sTask *next;
-};
+#define SCH_MAX_TASKS 40
+#define TICK 10
+int Last_Task = 0;
 
-struct container {
-	struct sTask *tail;
-	int numSlot;
-	int emptySlot;
-};
+typedef struct {
+    void (*pTask)(void);
+    uint32_t Delay;
+    uint32_t Period;
+    uint8_t RunMe;
+    uint32_t TaskID;
+} sTask;
 
-struct container* container;
+sTask SCH_Tasks_G[SCH_MAX_TASKS];
 
-
-struct sTask* Add_Node(struct sTask** curr, void(*pFunction)(), uint32_t DELAY, uint32_t PERIOD) {
-    struct sTask *temp = (struct sTask*)malloc(sizeof(struct sTask));
-    temp -> pTask = pFunction;
-    temp -> Delay = DELAY;
-    temp -> Period = PERIOD;
-    if (curr == NULL || *curr == NULL) {
-        temp -> next = temp;
+void SCH_INIT(void) {
+    int i;
+    for (i = 0; i < SCH_MAX_TASKS; i++) {
+        SCH_Delete_Task(i);
     }
-    else {
-        temp -> next = (*curr) -> next;
-    }
-    return temp;
 }
 
-void SCH_Init(void) {
-    container = (struct container*)malloc(sizeof(struct container));
-	container -> tail = NULL;
-	container -> numSlot = 0;
-	container -> emptySlot = 0;
-}
-
-void SCH_Add_Task(void(*pFunction)(), uint32_t DELAY, uint32_t PERIOD) {
-	// container empty
-	if (container -> tail == NULL) {
-		container -> tail = Add_Node(NULL, pFunction, DELAY, PERIOD);
-		(container -> numSlot)++;
-	}
-	else {
-		struct sTask* temp = container -> tail;
-		uint32_t sumDelay = 0;
-		uint32_t newDelay = 0;
-		// find first task with bigger delay
-		for (int i = 0; i < container -> numSlot; i++) {
-			sumDelay = sumDelay + temp -> next -> Delay;
-			// add head or middle
-			if (sumDelay > DELAY) {
-                // delay of new task
-				newDelay = DELAY - (sumDelay - temp -> next -> Delay);
-				temp -> next -> Delay = sumDelay - DELAY;
-				// create new node if there is no empty slot
-				if (container -> emptySlot == 0) {
-					temp -> next = Add_Node(&temp, pFunction, newDelay, PERIOD);
-					(container -> numSlot)++;
-                }
-				// if is, move tail to after temp and use it
-				else {
-					container -> tail -> pTask = pFunction;
-					container -> tail -> Delay = newDelay;
-					container -> tail -> Period = PERIOD;
-					struct sTask *newTail = temp -> next;
-					while (newTail -> next != container -> tail) {
-						newTail = newTail -> next;
-					}
-					if (temp == container -> tail) container -> tail = newTail;
-					else {
-						newTail -> next = container -> tail -> next;
-						container -> tail -> next = temp -> next;
-						temp -> next = container -> tail;
-						container -> tail = newTail;
-					}
-                    (container -> emptySlot)--;
-				}
+void SCH_Add_Task(void (*pFunction)(), uint32_t DELAY, uint32_t PERIOD) {
+    int Indextoadd = Last_Task;
+    DELAY = DELAY / 10;
+    if (Last_Task < SCH_MAX_TASKS) {
+        for (int i = 0; i < Last_Task; i++) {
+            if (SCH_Tasks_G[i].Delay <= DELAY) {
+                continue;
+            } else {
+                Indextoadd = i;
                 break;
-			} else {
-				// add tail
-                if (temp -> next -> pTask == 0x0000) {
-					temp -> next -> pTask = pFunction;
-					temp -> next -> Delay = DELAY - sumDelay;
-					temp -> next -> Period = PERIOD;
-                    (container -> emptySlot)--;
-					break;
-				}
-				else {
-					if (temp -> next == container -> tail) {
-						container -> tail -> next = Add_Node(&(container -> tail), pFunction, DELAY - sumDelay, PERIOD);
-						container -> tail = container -> tail -> next;
-						(container -> numSlot)++;
-						break;
-					}
-				}
-
-			}
-			temp = temp -> next;
-		}
-	}
-
+            }
+        }
+        for (int i = Last_Task; i > Indextoadd; i--) {
+            SCH_Tasks_G[i] = SCH_Tasks_G[i - 1];
+        }
+        Last_Task++;
+        SCH_Tasks_G[Indextoadd].pTask = pFunction;
+        SCH_Tasks_G[Indextoadd].Delay = DELAY;
+        SCH_Tasks_G[Indextoadd].Period = PERIOD;
+        SCH_Tasks_G[Indextoadd].RunMe = 0;
+//        if (Indextoadd < Last_Task - 1) {
+//            SCH_Tasks_G[Indextoadd + 1].Delay -= SCH_Tasks_G[Indextoadd].Delay;
+//        }
+    }
 }
-
-void SCH_Delete_Task(struct sTask** preDel) {
-    struct sTask* del = (*preDel) -> next;
-    if (del != container -> tail) del -> next -> Delay += del -> Delay;
-	del -> pTask = 0x0000;
-	del -> Delay = 0;
-	del -> Period = 0;
-	if (*preDel == container -> tail)
-		container -> tail = container -> tail -> next;
-	else {
-		if (del -> next -> pTask != 0 && del != container -> tail) {
-			(*preDel) -> next = del -> next;
-			del -> next = container -> tail -> next;
-			container -> tail -> next = del;
-			container -> tail = del;
-		}
-	}
-	(container -> emptySlot)++;
-}
-
 
 void SCH_Update(void) {
-	if (container -> tail) {
-		if (container -> tail -> next -> Delay > 0)
-			(container -> tail -> next -> Delay)--;
-	}
+    for (int i = 0; i < Last_Task; i++) {
+        if (SCH_Tasks_G[i].Delay > 0) {
+            SCH_Tasks_G[i].Delay--;
+        }
+        if (SCH_Tasks_G[i].Delay == 0) {
+            SCH_Tasks_G[i].RunMe++;
+        }
+        if(SCH_Tasks_G[i].Delay < 0){
+        	return;
+        }
+    }
+//    if (SCH_Tasks_G[0].Delay > 0) {
+//        SCH_Tasks_G[0].Delay--;
+//    }
+//    if (SCH_Tasks_G[0].Delay == 0) {
+//        SCH_Tasks_G[0].RunMe++;
+//    }
+//    if(SCH_Tasks_G[0].Delay < 0){
+//    	return;
+//    }
 }
 
+void SCH_Dispatch_Task(void) {
+    for (int i = 0; i < Last_Task; i++) {
+        if (SCH_Tasks_G[i].RunMe > 0) {
+            SCH_Tasks_G[i].RunMe--;
+            (*SCH_Tasks_G[i].pTask)();
+            sTask temp = SCH_Tasks_G[i];
+            SCH_Delete_Task(i);
+            if (temp.Period > 0) {
+                SCH_Add_Task(temp.pTask, temp.Period, temp.Period);
+            } else if (temp.Period == 0) {
+                SCH_Add_Task(temp.pTask, 0, 0);
+            }
+        }
+    }
+}
 
-void SCH_Dispatch_Tasks(void) {
-	while (container -> tail -> next -> Delay <= 0) {
-		(*(container -> tail -> next -> pTask))();
-		struct sTask temp = *(container -> tail -> next);
-		SCH_Delete_Task(&(container -> tail));
-		if (temp.Period != 0) {
-			SCH_Add_Task(temp.pTask, temp.Period, temp.Period);
-		}
-	}
+void SCH_Add_Oneshot_Task(void (*pFunction)(), uint32_t DELAY) {
+    SCH_Add_Task(pFunction, DELAY, -1);
+}
+
+void SCH_Delete_Task(uint32_t index) {
+    if (index >= Last_Task) {
+        return;
+    }
+//    if (index < Last_Task - 1) {
+//        SCH_Tasks_G[index + 1].Delay += SCH_Tasks_G[index].Delay;
+//    }
+    for (int i = index; i < Last_Task - 1; i++) {
+        SCH_Tasks_G[i] = SCH_Tasks_G[i + 1];
+    }
+    SCH_Tasks_G[Last_Task - 1].pTask = NULL;
+    SCH_Tasks_G[Last_Task - 1].Delay = 0;
+    SCH_Tasks_G[Last_Task - 1].Period = 0;
+    SCH_Tasks_G[Last_Task - 1].RunMe = 0;
+    Last_Task--;
 }

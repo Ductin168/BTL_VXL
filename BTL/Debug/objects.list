@@ -1,6 +1,7 @@
-"./Core/Src/System_FSM.o"
 "./Core/Src/Traffic_Light_FSM.o"
 "./Core/Src/button.o"
+"./Core/Src/fsm_auto_run.o"
+"./Core/Src/fsm_manual_run.o"
 "./Core/Src/global.o"
 "./Core/Src/i2c-lcd.o"
 "./Core/Src/main.o"

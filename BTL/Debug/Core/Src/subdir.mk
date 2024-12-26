@@ -5,9 +5,10 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Core/Src/System_FSM.c \
 ../Core/Src/Traffic_Light_FSM.c \
 ../Core/Src/button.c \
+../Core/Src/fsm_auto_run.c \
+../Core/Src/fsm_manual_run.c \
 ../Core/Src/global.c \
 ../Core/Src/i2c-lcd.c \
 ../Core/Src/main.c \
@@ -20,9 +21,10 @@ C_SRCS += \
 ../Core/Src/system_stm32f1xx.c 
 
 C_DEPS += \
-./Core/Src/System_FSM.d \
 ./Core/Src/Traffic_Light_FSM.d \
 ./Core/Src/button.d \
+./Core/Src/fsm_auto_run.d \
+./Core/Src/fsm_manual_run.d \
 ./Core/Src/global.d \
 ./Core/Src/i2c-lcd.d \
 ./Core/Src/main.d \
@@ -35,9 +37,10 @@ C_DEPS += \
 ./Core/Src/system_stm32f1xx.d 
 
 OBJS += \
-./Core/Src/System_FSM.o \
 ./Core/Src/Traffic_Light_FSM.o \
 ./Core/Src/button.o \
+./Core/Src/fsm_auto_run.o \
+./Core/Src/fsm_manual_run.o \
 ./Core/Src/global.o \
 ./Core/Src/i2c-lcd.o \
 ./Core/Src/main.o \

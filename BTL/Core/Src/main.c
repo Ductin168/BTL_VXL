@@ -23,11 +23,16 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "global.h"
-#include "System_FSM.h"
 #include "scheduler.h"
 #include "i2c-lcd.h"
 #include "software_timer.h"
 #include "button.h"
+#include "fsm_auto_run.h"
+#include "fsm_manual_run.h"
+#include "Traffic_Light_FSM.h"
+
+#include <stdio.h>
+#include "stm32f1xx_hal.h"  // Ensure this header is included
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -107,37 +112,18 @@ int main(void)
   lcd_clear_display();
   HAL_Delay(50);
 
-  SCH_Init();
-  SCH_Add_Task(fsm_traffic, 50, 1);
-//  SCH_Add_Task(clock_counter_traffic_update, 0, 1);
-  SCH_Add_Task(fsm_switch_mode, 50, 1);
-  SCH_Add_Task(fsm_traffic_auto_mode(), 50, 1);
-  SCH_Add_Task(fsm_traffic_tunning_mode(), 50, 1);
-
-
+  SCH_INIT();
+  SCH_Add_Task(automatic_run, 0, 0);
+  SCH_Add_Task(fsmmanual_run, 0, 0);
+  SCH_Add_Task(getKeyInput, 0, 0);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  init_led();
   while (1)
   {
-//fsm_traffic_auto_mode();
-//fsm_traffic_tunning_mode();
-//fsm_switch_mode();
-//fsm_traffic();
-	  SCH_Dispatch_Tasks();
-//	  if(isButtonShortPressed(0)){
-//		  lcd_clear_display();
-//		  HAL_Delay(100);
-//		  lcd_goto_XY(1, 0);
-//		  lcd_send_string("acbca");
-//	  }
-//	  if(isButtonLongPressed(0)){
-//		  lcd_clear_display();
-//		  HAL_Delay(100);
-//		  lcd_goto_XY(1, 0);
-//		  lcd_send_string("vxcvxbf");
-//	  }
+	  SCH_Dispatch_Task();
 
     /* USER CODE END WHILE */
 
@@ -317,6 +303,9 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, LED1_B_Pin|LED1_A_Pin, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
@@ -345,8 +334,15 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(BUTTON2_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : BUTTON3_Pin BUTTON1_Pin */
-  GPIO_InitStruct.Pin = BUTTON3_Pin|BUTTON1_Pin;
+  /*Configure GPIO pin : LED2_Pin */
+  GPIO_InitStruct.Pin = LED2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LED2_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : BUTTON4_Pin BUTTON3_Pin BUTTON1_Pin */
+  GPIO_InitStruct.Pin = BUTTON4_Pin|BUTTON3_Pin|BUTTON1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -360,10 +356,9 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  if (htim->Instance == TIM2) {
-    timerRun(); // G�?i hàm cập nhật bộ đếm th�?i gian của bạn
-  }
+  timerRun();
   getKeyInput();
+  SCH_Update();
 }
 /* USER CODE END 4 */
 

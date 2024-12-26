@@ -3,7 +3,13 @@ Edit by modify: Ngoc Hang
 **/
 
 #include "stm32f1xx_hal.h"
-
+#include "global.h"
+#include "scheduler.h"
+#include "software_timer.h"
+#include "button.h"
+#include "fsm_auto_run.h"
+#include "fsm_manual_run.h"
+#include "Traffic_Light_FSM.h"
 void lcd_init (void);   // initialize lcd
 
 void lcd_send_cmd (char cmd);  // send command to the lcd

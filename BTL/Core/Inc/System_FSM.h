@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "stm32f1xx_hal.h"
+#include "uart.h"
 
 #define DEBOUNCE_DELAY 200 // 200 ms debounce delay
 

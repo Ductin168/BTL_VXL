@@ -1,60 +1,44 @@
 /*
  * global.h
  *
- *  Created on: Nov 24, 2024
- *      Author: Dell
+ *  Created on: Sep 23, 2024
+ *      Author: DUC TIN
  */
 
 #ifndef INC_GLOBAL_H_
 #define INC_GLOBAL_H_
 
 #include "main.h"
-#include "Traffic_Light_FSM.h"
-#include "System_FSM.h"
+#include "global.h"
 #include "scheduler.h"
+#include "i2c-lcd.h"
 #include "software_timer.h"
-#include <stdio.h>
+#include "button.h"
+#include "fsm_auto_run.h"
+#include "fsm_manual_run.h"
+#include "Traffic_Light_FSM.h"
 
-#define TIME_CYCLE	10
-#define NUM_TIMER	4
+#define INIT 1
+#define GREEN_RED 2
+#define YELLOW_RED 3
+#define RED_GREEN 4
+#define RED_YELLOW 5
 
-//global init and off status
-#define	INIT		10
-#define OFF			0
+#define MAN_GREEN_RED 10
+#define MAN_YELLOW_RED 11
+#define MAN_RED_GREEN 12
+#define MAN_RED_YELLOW 13
 
-//MODE OF SYSTEM
-#define AUTO_MODE 	1
-#define MANUAL_MODE 2
-#define TUNING_MODE 3
-#define ERROR_MODE	4
-//STATE for AUTO / MANUAL SETTING
-#define	RED_GREEN	1
-#define	RED_AMBER	2
-#define	GREEN_RED	3
-#define	AMBER_RED	4
-
-//STATE for TUNING SETTING
-#define	RED_ADJ		1
-#define AMBER_ADJ	2
-#define GREEN_ADJ	3
-
-extern int timeRed;
-extern int timeAmber;
-extern int timeGreen;
-
-extern int clock_counter_main;
-extern int clock_counter_side;
-
-//String use for UART
-extern char str[];
-
-extern UART_HandleTypeDef huart2;
-
-
-//Variable use for FSM
-extern int autoStatus;
-extern int manualStatus;
-extern int tuningStatus;
-extern int trafficMode;
+extern int currentmode;
+extern int MODE;
+extern int status;
+extern int countRed;
+extern int countGreen;
+extern int countYellow;
+extern int red,yellow,green;
+extern int count, count1,count2;
+extern int initRED;
+extern int initYELLOW;
+extern int initGREEN;
 
 #endif /* INC_GLOBAL_H_ */
